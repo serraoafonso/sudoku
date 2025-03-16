@@ -1,14 +1,16 @@
 const sudoku = [
-  ["6", " ", "9", " ", " ", "7", " ", " ", " "],
-  [" ", "3", " ", " ", "9", "4", "6", "7", "2"],
-  ["8", " ", " ", "1", " ", " ", " ", "5", " "],
-  ["4", "9", " ", "3", " ", " ", " ", "5", " "],
-  [" ", " ", " ", " ", " ", " ", " ", " ", "6"],
-  ["7", " ", "3", " ", "1", " ", "2", "8", " "],
-  ["9", "6", "2", " ", "3", " ", " ", " ", "5"],
-  ["1", "8", " ", "2", " ", " ", "7", "6", " "],
-  [" ", "7", "4", "6", "5", "1", " ", " ", " "],
+  ["2", " ", "6", "3", "7", " ", " ", " ", " "],
+  ["5", "1", " ", "4", " ", " ", "7", " ", " "],
+  ["4", "3", " ", " ", "6", " ", " ", " ", "8"],
+  ["9", "6", " ", " ", "5", " ", " ", " ", " "],
+  [" ", "5", "3", " ", "8", " ", " ", " ", " "],
+  ["7", "8", " ", " ", "1", " ", "5", "4", "9"],
+  [" ", "4", " ", " ", " ", " ", " ", "5", "7"],
+  [" ", "7", "5", " ", "9", "6", "2", " ", " "],
+  [" ", " ", "1", "7", "4", " ", "3", "9", "6"],
 ];
+
+
 
 const possible = [
   [
@@ -113,26 +115,40 @@ const possible = [
 ];
 
 function start() {
-  checkPossibles();
-  checkLastPossible();
-  checkPossibles();
-  checkLastPossible();
-  checkPossibles();
-  checkLastPossible();
+  checkPossibles()
+}
+
+function checkIfLastPossible(){
+  let isLast = false
+  for (let i = 0; i < 9; i++) {
+    for (let a = 0; a < 9; a++) {
+      if (
+        possible[i][a].completed == false &&
+        possible[i][a].numbers.length == 1
+      ){
+        isLast = true;
+        break;
+      }
+    }
+  }
+  if(isLast){
+    checkLastPossible()
+  }
 }
 
 
-function checkPossibles() {
+async function checkPossibles() {
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
       if (sudoku[i][a] != " ") {
         possible[i][a].completed = true;
       } else {
         possible[i][a].numbers = []
-        fillPossibles(i, a);
+        await fillPossibles(i, a);
       }
     }
   }
+  checkIfLastPossible()
 }
 
 function fillPossibles(i, a) {
@@ -265,6 +281,13 @@ function fillPossibles(i, a) {
 }
 
 function checkLastPossible() {
+  for (let i = 0; i < 9; i++) {
+    if(i == 0){
+      console.log('-----------------')
+    }
+    console.log(...sudoku[i]);
+  }
+  
   let full = true;
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
@@ -275,18 +298,19 @@ function checkLastPossible() {
         // ve se só tem uma opcao
         sudoku[i][a] = possible[i][a].numbers[0];
         possible[i][a].completed = true;
-        possible[i][a].numbers.pop()
+        possible[i][a].numbers = []
       }
       if (sudoku[i][a] == " ") {
         full = false;
       }
+      checkPossibles()
     }
   }
   if (full) {
+    
+    console.log('O SUDOKU FOI PREENCHIDO')
     for (let i = 0; i < 9; i++) {
-      for (let a = 0; a < 9; a++) {
-        console.log(sudoku[i][a]);
-      }
+        console.log(...sudoku[i],);
     }
   }
 }
@@ -294,11 +318,5 @@ function checkLastPossible() {
 start();
 for (let i = 0; i < 9; i++) {
   console.log(...sudoku[i]);
-}
-
-for (let i = 0; i < 9; i++) {
-  for (let a = 0; a < 9; a++) {
-    console.log(possible[i][a].numbers, possible[i][a].completed);
-  }
 }
 
