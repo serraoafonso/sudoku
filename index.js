@@ -1,16 +1,14 @@
 const sudoku = [
-  ["2", " ", "6", "3", "7", " ", " ", " ", " "],
-  ["5", "1", " ", "4", " ", " ", "7", " ", " "],
-  ["4", "3", " ", " ", "6", " ", " ", " ", "8"],
-  ["9", "6", " ", " ", "5", " ", " ", " ", " "],
-  [" ", "5", "3", " ", "8", " ", " ", " ", " "],
-  ["7", "8", " ", " ", "1", " ", "5", "4", "9"],
-  [" ", "4", " ", " ", " ", " ", " ", "5", "7"],
-  [" ", "7", "5", " ", "9", "6", "2", " ", " "],
-  [" ", " ", "1", "7", "4", " ", "3", "9", "6"],
+  [" ", "8", " ", " ", "3", "2", " ", "7", " "],
+  ["7", " ", " ", " ", " ", " ", "1", "6", " "],
+  [" ", " ", " ", " ", " ", "4", "5", " ", " "],
+  ["1", " ", " ", " ", " ", " ", " ", " ", "4"],
+  [" ", " ", " ", " ", "5", "6", "8", " ", " "],
+  ["5", " ", " ", "4", "2", " ", " ", " ", " "],
+  [" ", " ", " ", "3", " ", " ", " ", " ", " "],
+  ["4", " ", " ", " ", " ", " ", "8", " ", "1"],
+  [" ", "2", " ", " ", "7", " ", " ", " ", " "]
 ];
-
-
 
 const possible = [
   [
@@ -114,11 +112,20 @@ const possible = [
   ],
 ];
 
+
+
+let startTime;
+let full = false;
+
 function start() {
-  checkPossibles()
+  startTime = Date.now()
+  checkPossibles(sudoku)
 }
 
-function checkIfLastPossible(){
+start();
+
+async function checkIfLastPossible(sudoku){
+  if (full) return;
   let isLast = false
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
@@ -132,26 +139,55 @@ function checkIfLastPossible(){
     }
   }
   if(isLast){
-    checkLastPossible()
+    checkLastPossible(sudoku)
+  }
+  if (full) {
+    console.log('O SUDOKU FOI PREENCHIDO')
+    for (let i = 0; i < 9; i++) {
+        console.log(...sudoku[i]);
+    }
+    console.log(`Execution time: ${Date.now() - startTime}`)
+
+  }else if(!full && !isLast){
+
+    for (let i = 0; i < 9; i++) {
+       console.log(...sudoku[i]);
+    }
+    console.log('It ran out of lonely possible numbers')  
+    //randomizeEmpty()
   }
 }
 
+function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
+  let imaginarySudoku = sudoku
+    for(let i = 0; i < 9; i++){
+      for(let a = 0; a < 9; a++){
+        if(possible[i][a].completed == false){
+          for(let d = 0; d < possible[i][a].numbers.length; d++){
+            imaginarySudoku[i][a] = possible[i][a].numbers[d]
+            checkPossibles(imaginarySudoku)
+          }
+        }
+      }
+    }
+}
 
-async function checkPossibles() {
+
+async function checkPossibles(sudoku) {
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
       if (sudoku[i][a] != " ") {
         possible[i][a].completed = true;
       } else {
         possible[i][a].numbers = []
-        await fillPossibles(i, a);
+        await fillPossibles(i, a, sudoku);
       }
     }
   }
-  checkIfLastPossible()
+  checkIfLastPossible(sudoku)
 }
 
-function fillPossibles(i, a) {
+function fillPossibles(i, a, sudoku) {
   // o i corresponde á linha e o a corresponde á coluna
   let rowEqual = false;
   let collumnEqual = false;
@@ -280,7 +316,7 @@ function fillPossibles(i, a) {
   }
 }
 
-function checkLastPossible() {
+function checkLastPossible(sudoku) {
   for (let i = 0; i < 9; i++) {
     if(i == 0){
       console.log('-----------------')
@@ -288,7 +324,7 @@ function checkLastPossible() {
     console.log(...sudoku[i]);
   }
   
-  let full = true;
+  full = true;
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
       if (
@@ -303,20 +339,10 @@ function checkLastPossible() {
       if (sudoku[i][a] == " ") {
         full = false;
       }
-      checkPossibles()
+      checkPossibles(sudoku)
     }
   }
-  if (full) {
-    
-    console.log('O SUDOKU FOI PREENCHIDO')
-    for (let i = 0; i < 9; i++) {
-        console.log(...sudoku[i],);
-    }
-  }
+
 }
 
-start();
-for (let i = 0; i < 9; i++) {
-  console.log(...sudoku[i]);
-}
 
