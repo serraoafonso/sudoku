@@ -116,6 +116,9 @@ const possible = [
 
 let startTime;
 let full = false;
+let buraco = false;
+let used = [];
+let randomizar = false;
 
 function start() {
   startTime = Date.now()
@@ -129,19 +132,22 @@ async function checkIfLastPossible(sudoku){
   let isLast = false
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
-      if (
-        possible[i][a].completed == false &&
-        possible[i][a].numbers.length == 1
-      ){
+      if (possible[i][a].completed == false && possible[i][a].numbers.length == 1){
+
         isLast = true;
+        buraco = false;
         break;
+
+      }else if(possible[i][a].numbers.length < 1 /*&& possible[i][a].completed == false*/  && sudoku[i][a] == " "){
+        
+        buraco = true;  
+
       }
     }
   }
   if(isLast){
     checkLastPossible(sudoku)
-  }
-  if (full) {
+  }else if (full) {
     console.log('O SUDOKU FOI PREENCHIDO')
     for (let i = 0; i < 9; i++) {
         console.log(...sudoku[i]);
@@ -154,20 +160,74 @@ async function checkIfLastPossible(sudoku){
        console.log(...sudoku[i]);
     }
     console.log('It ran out of lonely possible numbers')  
-    //randomizeEmpty()
+    randomizeEmpty()
   }
 }
 
+
 function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
+  randomizar = true;
   let imaginarySudoku = sudoku
-    for(let i = 0; i < 9; i++){
-      for(let a = 0; a < 9; a++){
-        if(possible[i][a].completed == false){
-          for(let d = 0; d < possible[i][a].numbers.length; d++){
-            imaginarySudoku[i][a] = possible[i][a].numbers[d]
-            checkPossibles(imaginarySudoku)
+
+    if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar
+      console.log('buraco', used.length)
+      if(used.allOptions.length != optionsUsed){
+        for(let c = 0; c < used[used.length-1].allOptions.length; c++){
+          if(used.allOptions[c] != used.optionsUsed[c]){
+            let i = used[used.length-1].position[0];
+            let a = used[used.length-1].position[1];
+            used.push({
+              numbers: used[used.length-1].allOptions[c],
+              position : [i, a],
+              previous: used.length > 0 ? used[used.length-1] : null,
+              allOptions: possible[i][a].numbers,
+              optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? optionsUsed.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
+            })
+            imaginarySudoku[i][a] = used[used.length-1].allOptions[c]
+            //possible[i][a].completed = true;
+            
+            checkLastPossible(imaginarySudoku);
+
           }
         }
+      }
+    }
+
+    for(let i = 0; i < 9; i++){
+      for(let a = 0; a < 9; a++){
+        if(possible[i][a].completed == false && buraco == false){
+          console.log('nao buraco', used.length)
+          if(used.length > 0){//caso nao seja a primeira vez a randomizar e nao estar num buraco, randomizar noutra possicao
+            used.push({
+              numbers: possible[i][a].numbers[0],
+              position : [i, a],
+              previous: used.length > 0 ? used[used.length-1] : null,
+              allOptions: possible[i][a].numbers,
+              optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
+            })
+            imaginarySudoku[i][a] = possible[i][a].numbers[0];
+            //possible[i][a].completed = true;
+            checkLastPossible(imaginarySudoku);
+            break;
+
+          }else{// caso seja a primeira vez a randomizar
+            console.log('first time')
+            used.push({
+              numbers: possible[i][a].numbers[0],
+              position : [i, a],
+              previous:  null,
+              allOptions: possible[i][a].numbers,
+              optionsUsed:  [possible[i][a].numbers[0]]
+            })
+            imaginarySudoku[i][a] = possible[i][a].numbers[0];
+            //possible[i][a].completed = true;
+            checkLastPossible(imaginarySudoku);
+            break;
+
+          }
+            
+            
+          }
       }
     }
 }
@@ -333,8 +393,10 @@ function checkLastPossible(sudoku) {
       ) {
         // ve se só tem uma opcao
         sudoku[i][a] = possible[i][a].numbers[0];
-        possible[i][a].completed = true;
-        possible[i][a].numbers = []
+        possible[i][a].completed = !randomizar;
+        if(!randomizar) {
+          possible[i][a].numbers = []
+        }
       }
       if (sudoku[i][a] == " ") {
         full = false;
@@ -342,7 +404,6 @@ function checkLastPossible(sudoku) {
       checkPossibles(sudoku)
     }
   }
-
 }
 
 
