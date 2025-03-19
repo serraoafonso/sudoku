@@ -133,9 +133,10 @@ async function checkIfLastPossible(sudoku){
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
       if (possible[i][a].completed == false && possible[i][a].numbers.length == 1){
-
-        isLast = true;
-        buraco = false;
+        
+        if(sudoku[i][a] == " "){
+          isLast = true;
+        }  
         break;
 
       }else if(possible[i][a].numbers.length < 1 /*&& possible[i][a].completed == false*/  && sudoku[i][a] == " "){
@@ -170,10 +171,13 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
   let imaginarySudoku = sudoku
 
     if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar
+
       console.log('buraco', used.length)
-      if(used.allOptions.length != optionsUsed){
+
+      if(used[used.length - 1].allOptions.length > used[used.length-1].optionsUsed.length){
+
         for(let c = 0; c < used[used.length-1].allOptions.length; c++){
-          if(used.allOptions[c] != used.optionsUsed[c]){
+          if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){
             let i = used[used.length-1].position[0];
             let a = used[used.length-1].position[1];
             used.push({
@@ -183,11 +187,18 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
               allOptions: possible[i][a].numbers,
               optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? optionsUsed.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
             })
-            imaginarySudoku[i][a] = used[used.length-1].allOptions[c]
+            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];
             //possible[i][a].completed = true;
-            
-            checkLastPossible(imaginarySudoku);
+            checkPossibles(imaginarySudoku);
 
+          }
+        }
+      }else{
+        let currentPosition = used[used.length - 1].position
+        for(let d = used.length; d >= 0; d--){
+          if(used[d].position != currentPosition){
+            used.slice(0, -d)//apaga os ultimos
+            break;
           }
         }
       }
@@ -198,8 +209,12 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
         if(possible[i][a].completed == false && buraco == false){
           console.log('nao buraco', used.length)
           if(used.length > 0){//caso nao seja a primeira vez a randomizar e nao estar num buraco, randomizar noutra possicao
+            if(possible[i][a].numbers.length == 0){
+              buraco = true;
+              break;
+            }
             used.push({
-              numbers: possible[i][a].numbers[0],
+              numbers: possible[i][a].numbers > 0 && possible[i][a].numbers[0],
               position : [i, a],
               previous: used.length > 0 ? used[used.length-1] : null,
               allOptions: possible[i][a].numbers,
@@ -207,7 +222,7 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
             })
             imaginarySudoku[i][a] = possible[i][a].numbers[0];
             //possible[i][a].completed = true;
-            checkLastPossible(imaginarySudoku);
+            checkPossibles(imaginarySudoku);
             break;
 
           }else{// caso seja a primeira vez a randomizar
@@ -221,7 +236,7 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
             })
             imaginarySudoku[i][a] = possible[i][a].numbers[0];
             //possible[i][a].completed = true;
-            checkLastPossible(imaginarySudoku);
+            checkPossibles(imaginarySudoku);
             break;
 
           }
