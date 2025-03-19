@@ -161,23 +161,33 @@ async function checkIfLastPossible(sudoku){
        console.log(...sudoku[i]);
     }
     console.log('It ran out of lonely possible numbers')  
-    randomizeEmpty()
+    randomizeEmpty(sudoku)
   }
 }
 
 
-function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
+function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
+  
+  imaginarySudoku = sudoku;
   randomizar = true;
-  let imaginarySudoku = sudoku
+
 
     if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar
+
+      for(let g = 0; g < 9; g++){
+        for(let h = 0; h < 9; h++){
+          if(possible[g][h].completed == false){
+            imaginarySudoku[g][h] = " "
+          }
+        }
+      }
 
       console.log('buraco', used.length)
 
       if(used[used.length - 1].allOptions.length > used[used.length-1].optionsUsed.length){
 
         for(let c = 0; c < used[used.length-1].allOptions.length; c++){
-          if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){
+          if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){//ta a perguntar se ja usou aquele numero dos possiveis, neste caso se ainda nao usou vai usar o proximo
             let i = used[used.length-1].position[0];
             let a = used[used.length-1].position[1];
             used.push({
@@ -189,69 +199,70 @@ function randomizeEmpty(){//esta funcao vai randomizar os valores que sao possiv
             })
             imaginarySudoku[i][a] = used[used.length-1].allOptions[c];
             //possible[i][a].completed = true;
-            checkPossibles(imaginarySudoku);
+            break;
 
           }
         }
+        checkPossibles(imaginarySudoku);
       }else{
         let currentPosition = used[used.length - 1].position
         for(let d = used.length; d >= 0; d--){
-          if(used[d].position != currentPosition){
+          if(used[d-1].position != currentPosition){
             used.slice(0, -d)//apaga os ultimos
             break;
           }
         }
       }
-    }
+    }else{
 
-    for(let i = 0; i < 9; i++){
-      for(let a = 0; a < 9; a++){
-        if(possible[i][a].completed == false && buraco == false){
-          console.log('nao buraco', used.length)
-          if(used.length > 0){//caso nao seja a primeira vez a randomizar e nao estar num buraco, randomizar noutra possicao
-            if(possible[i][a].numbers.length == 0){
-              buraco = true;
+      for(let i = 0; i < 9; i++){
+        for(let a = 0; a < 9; a++){
+          if(possible[i][a].completed == false){
+            console.log('nao buraco', used.length)
+            if(used.length > 0){//caso nao seja a primeira vez a randomizar e nao estar num buraco, randomizar noutra possicao
+              if(possible[i][a].numbers.length == 0){
+                buraco = true;
+                break;
+              }
+              used.push({
+                numbers: possible[i][a].numbers > 0 && possible[i][a].numbers[0],
+                position : [i, a],
+                previous: used.length > 0 ? used[used.length-1] : null,
+                allOptions: possible[i][a].numbers,
+                optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
+              })
+              console.log('a')
+              imaginarySudoku[i][a] = possible[i][a].numbers[0];
+              //possible[i][a].completed = true;
               break;
+  
+            }else{// caso seja a primeira vez a randomizar
+              console.log('first time')
+              used.push({
+                numbers: possible[i][a].numbers[0],
+                position : [i, a],
+                previous:  null,
+                allOptions: possible[i][a].numbers,
+                optionsUsed:  [possible[i][a].numbers[0]]
+              })
+              imaginarySudoku[i][a] = possible[i][a].numbers[0];
+              //possible[i][a].completed = true;
+              break;
+  
             }
-            used.push({
-              numbers: possible[i][a].numbers > 0 && possible[i][a].numbers[0],
-              position : [i, a],
-              previous: used.length > 0 ? used[used.length-1] : null,
-              allOptions: possible[i][a].numbers,
-              optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
-            })
-            imaginarySudoku[i][a] = possible[i][a].numbers[0];
-            //possible[i][a].completed = true;
-            checkPossibles(imaginarySudoku);
-            break;
-
-          }else{// caso seja a primeira vez a randomizar
-            console.log('first time')
-            used.push({
-              numbers: possible[i][a].numbers[0],
-              position : [i, a],
-              previous:  null,
-              allOptions: possible[i][a].numbers,
-              optionsUsed:  [possible[i][a].numbers[0]]
-            })
-            imaginarySudoku[i][a] = possible[i][a].numbers[0];
-            //possible[i][a].completed = true;
-            checkPossibles(imaginarySudoku);
-            break;
-
           }
-            
-            
-          }
+        }
       }
+      checkPossibles(imaginarySudoku);
     }
+    
 }
 
 
 async function checkPossibles(sudoku) {
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
-      if (sudoku[i][a] != " ") {
+      if (sudoku[i][a] != " " && !randomizar) {
         possible[i][a].completed = true;
       } else {
         possible[i][a].numbers = []
@@ -416,9 +427,10 @@ function checkLastPossible(sudoku) {
       if (sudoku[i][a] == " ") {
         full = false;
       }
-      checkPossibles(sudoku)
+      
     }
   }
+  checkPossibles(sudoku)
 }
 
 
