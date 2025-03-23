@@ -183,10 +183,13 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
       }
 
       console.log('buraco', used.length)
+      console.log(used[used.length - 1].allOptions, used[used.length-1].optionsUsed)
 
       if(used[used.length - 1].allOptions.length > used[used.length-1].optionsUsed.length){
-
+       
+  
         for(let c = 0; c < used[used.length-1].allOptions.length; c++){
+          console.log(used[used.length-1].allOptions[c])
           if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){//ta a perguntar se ja usou aquele numero dos possiveis, neste caso se ainda nao usou vai usar o proximo
             let i = used[used.length-1].position[0];
             let a = used[used.length-1].position[1];
@@ -194,10 +197,12 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
               numbers: used[used.length-1].allOptions[c],
               position : [i, a],
               previous: used.length > 0 ? used[used.length-1] : null,
-              allOptions: possible[i][a].numbers,
-              optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? optionsUsed.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
+              allOptions: (used[used.length-1].position == [i,a] /*&& used[used.length-1].optionsUsed.length > 0*/) ? used[used.length - 1].allOptions : possible[i][a].numbers,
+              optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? /*optionsUsed.push(possible[i][a].numbers[0])*/    [...used[used.length - 1], used[used.length-1].allOptions[c]] : [possible[i][a].numbers[0]]
             })
-            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];
+            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];//o problema anda aqui
+            console.log(used[used.length-1].allOptions[c])
+            console.log(used[used.length-1].allOptions, c)
             //possible[i][a].completed = true;
             break;
 
@@ -231,7 +236,6 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 allOptions: possible[i][a].numbers,
                 optionsUsed: (used[used.length-1].position == [i,a] && used[used.length-1].optionsUsed.length > 0) ? used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
               })
-              console.log('a')
               imaginarySudoku[i][a] = possible[i][a].numbers[0];
               //possible[i][a].completed = true;
               break;
@@ -403,12 +407,13 @@ function fillPossibles(i, a, sudoku) {
 }
 
 function checkLastPossible(sudoku) {
+  /*
   for (let i = 0; i < 9; i++) {
     if(i == 0){
       console.log('-----------------')
     }
     console.log(...sudoku[i]);
-  }
+  }*/
   
   full = true;
   for (let i = 0; i < 9; i++) {
