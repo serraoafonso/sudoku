@@ -10,6 +10,7 @@ const sudoku = [
   [" ", "2", " ", " ", "7", " ", " ", " ", " "]
 ];
 
+
 const possible = [
   [
     { numbers: [], completed: false },
@@ -185,7 +186,7 @@ async function checkIfLastPossible(sudoku){
 
 
 function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
-  
+  console.log(used)
   imaginarySudoku = sudoku;
   randomizar = true;
 
@@ -234,25 +235,27 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
         let parar = false;
         let i = used[used.length - 1].position[0]
         let a = used[used.length - 1].position[1]
-        for(let d = 0; d <= used.length; d++){
-          if (parar) break;
+        for(let d = used.length - 1; d >= 0; d--){
+          
+          if(used[d].allOptions.length == used[d].optionsUsed.length){
+            
+            used = used.slice(0, -(used[d].allOptions.length));
 
-          if(used[used.length-d-1]?.position[0] == i && used[used.length-d-1]?.position[1] == a){
-          }else{
-
-            used = used.slice(0, - (d + 1))
-
-            for (let g = 0; g < 9; g++){
-              for(let h = 0; h < 9; h++){
-                if(g >= i && h > a){
-                  sudoku[g][h] = " "
+            for(let h = 0; h < 9; h++){
+              for(let g = 0; g < 9; g++){
+                if(h > i){
+                  sudoku[h][g] = " "
+                }else if(h == i && g >= a){
+                  sudoku[h][g] = " "
                 }
               }
             }
-            
-            parar = true;
+
             break;
+
           }
+          
+
         }
 
         checkPossibles(sudoku)
