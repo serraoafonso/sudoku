@@ -131,7 +131,13 @@ start();
 async function checkIfLastPossible(sudoku){
 
   console.log('---------------------')
+  full = true;
   for (let i = 0; i < 9; i++) {
+    for(let a = 0; a < 9; a++){
+      if(sudoku[i][a] == " "){
+        full = false;
+      }
+    }
     
     console.log(...sudoku[i]);
      
@@ -207,10 +213,8 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
   
         for(let c = 0; c < used[used.length-1].allOptions.length; c++){
           if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){//ta a perguntar se ja usou aquele numero dos possiveis, neste caso se ainda nao usou vai usar o proximo
-           console.log(c)
             let i = used[used.length-1].position[0];
             let a = used[used.length-1].position[1];
-            console.log(used[used.length-1].allOptions, '--> allOptions')
             
             used.push({
               numbers: used[used.length-1].allOptions[c],
@@ -219,10 +223,6 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
               optionsUsed: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? /*optionsUsed.push(possible[i][a].numbers[0])*/    [...used[used.length - 1].optionsUsed, used[used.length-1].allOptions[c]] : [possible[i][a].numbers[0]]
             })
             imaginarySudoku[i][a] = used[used.length-1].allOptions[c];//o problema anda aqui
-            console.log(used[used.length-1].allOptions[c], 'a')
-            console.log(used[used.length-1].allOptions, c)
-            console.log(used[used.length-1]);
-            console.log(used)
             //possible[i][a].completed = true;
             break;
 
@@ -231,16 +231,33 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
         checkPossibles(imaginarySudoku);
       }else{
         console.log('apagar')
+        let parar = false;
         let i = used[used.length - 1].position[0]
         let a = used[used.length - 1].position[1]
-        for(let d = used.length; d >= 0; d--){
-          if(used[used.length-d].position[0] == i && used[used.length-d].position[1] == a){
-            console.log(used.length)
+        for(let d = 0; d <= used.length; d++){
+          if (parar) break;
+
+          if(used[used.length-d-1]?.position[0] == i && used[used.length-d-1]?.position[1] == a){
+          }else{
+
+            used = used.slice(0, - (d + 1))
+
+            for (let g = 0; g < 9; g++){
+              for(let h = 0; h < 9; h++){
+                if(g >= i && h > a){
+                  sudoku[g][h] = " "
+                }
+              }
+            }
+            
             parar = true;
             break;
           }
         }
-        randomizeEmpty(sudoku)//loop infinito
+
+        checkPossibles(sudoku)
+
+        //loop infinito
       }
     }else{
       let parar = false;
