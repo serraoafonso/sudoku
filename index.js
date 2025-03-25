@@ -1,16 +1,16 @@
 const sudoku = [
-  [" ", "8", " ", "7", " ", " ", " ", " ", " "],
-  [" ", " ", " ", " ", "5", " ", "9", " ", " "],
-  ["7", " ", "1", " ", " ", "2", " ", "6", " "],
-  [" ", "2", " ", " ", " ", " ", " ", "8", " "],
-  [" ", "3", " ", " ", " ", "4", " ", " ", " "],
-  ["4", " ", "8", "9", " ", " ", "6", " ", " "],
-  ["6", " ", "4", " ", " ", "7", " ", "1", " "],
-  ["3", " ", " ", " ", " ", " ", " ", " ", " "],
-  [" ", " ", " ", "2", " ", " ", " ", " ", "7"]
+  ["8", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", "3", "6", " ", " ", " ", " ", " "],
+  [" ", "7", " ", " ", "9", " ", "2", " ", " "],
+  [" ", "5", " ", " ", " ", "7", " ", " ", " "],
+  [" ", " ", " ", " ", "4", "5", "7", " ", " "],
+  [" ", " ", " ", "1", " ", " ", " ", "3", " "],
+  [" ", " ", "1", " ", " ", " ", " ", "6", "8"],
+  [" ", " ", "8", "5", " ", " ", " ", "1", " "],
+  [" ", "9", " ", " ", " ", " ", "4", " ", " "]
 ];
 
-
+//array bidimensional que mostra uma array para cada célula dos números possíveis
 const possible = [
   [
     { numbers: [], completed: false },
@@ -117,10 +117,18 @@ const possible = [
 
 let startTime;
 let full = false;
-let buraco = false;
-let used = [];
-let randomizar = false;
-let apagado = false;
+let buraco = false; //entende-se buraco a situação em que os números randomizados levam a uma situação em que exista uma célula vazia e sem números possíveis nela
+let used = []; /*
+{
+numbers: 1,
+position: [0, 0],
+allOptions: [1, 2, 3], -> todas as opções que podem ser usadas naquela célula no momento
+optionsUsed: [1]
+}
+*/
+let randomizar = false;//fica true quando a primeira célula recebe um valor randomizado
+
+let impossible = false;
 
 function start() {
   startTime = Date.now()
@@ -131,11 +139,17 @@ start();
 
 async function checkIfLastPossible(sudoku){
 
+  if(impossible){
+    console.log('O SUDOKU NÃO PODE SER RESOLVIDO!');
+    console.log('Execution time: ', Date.now() - startTime)
+    return;
+  }
+
   console.log('---------------------')
   full = true;
   for (let i = 0; i < 9; i++) {
     for(let a = 0; a < 9; a++){
-      if(sudoku[i][a] == " "){
+      if(sudoku[i][a] == " "){//verifica se o sudoku já foi preenchido
         full = false;
       }
     }
@@ -146,17 +160,18 @@ async function checkIfLastPossible(sudoku){
  console.log('---------------------')
   
 
-  let isLast = false;
+  let isLast = false;// variavel que indica se existe alguma casa em que esteja vazia e apenas com uma opção possível
+
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
 
       if (sudoku[i][a] == " " && possible[i][a].numbers.length == 1 && !possible[i][a].completed){
-          console.log([i, a], sudoku[i][a])
+
           isLast = true;
 
         break;
 
-      }else if(possible[i][a].numbers.length < 1 /*&& possible[i][a].completed == false*/  && sudoku[i][a] == " "){
+      }else if(possible[i][a].numbers.length < 1 && sudoku[i][a] == " "){
         
         buraco = true;  
 
@@ -165,7 +180,7 @@ async function checkIfLastPossible(sudoku){
   }
 
   if(isLast){
-    checkLastPossible(sudoku)
+    checkLastPossible(sudoku)//funcao que preenche o sudoku com a unica opção possível
   }else if (full) {
     console.log('O SUDOKU FOI PREENCHIDO')
     for (let i = 0; i < 9; i++) {
@@ -173,42 +188,43 @@ async function checkIfLastPossible(sudoku){
     }
     console.log(`Execution time: ${Date.now() - startTime}`)
 
-  }else if(!full && !isLast){
-
+  }else{
     
     console.log('It ran out of lonely possible numbers')  
     randomizeEmpty(sudoku)
+
   }
 }
 
 
 function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
   console.log(used)
-  imaginarySudoku = sudoku;
   randomizar = true;
 
 
     if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar, buraco é quando existe celulas sem nenhum possivel e vazias
 
       console.log('buraco', used.length)
-      console.log(used[used.length - 1].allOptions, '->allOptions', used[used.length-1].optionsUsed, '->optionsUsed')
 
       if(used[used.length - 1].allOptions.length > used[used.length-1].optionsUsed.length){
        
   
         for(let c = 0; c < used[used.length-1].allOptions.length; c++){
-          if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){//ta a perguntar se ja usou aquele numero dos possiveis, neste caso se ainda nao usou vai usar o proximo
+
+          if(used[used.length-1].allOptions[c] != used[used.length-1].optionsUsed[c]){//ta a perguntar se ja usou aquele numero dos possiveis, neste caso se ainda nao usou, vai usar o proximo
             let i = used[used.length-1].position[0];
             let a = used[used.length-1].position[1];
             
             used.push({
               numbers: used[used.length-1].allOptions[c],
               position : [i, a],
-              allOptions: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) /*&& used[used.length-1].optionsUsed.length > 0*/) ? used[used.length - 1].allOptions : possible[i][a].numbers,
-              optionsUsed: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? /*optionsUsed.push(possible[i][a].numbers[0])*/    [...used[used.length - 1].optionsUsed, used[used.length-1].allOptions[c]] : [possible[i][a].numbers[0]]
+              allOptions:  used[used.length - 1].allOptions,
+              optionsUsed: [...used[used.length - 1].optionsUsed, used[used.length-1].allOptions[c]] 
             })
-            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];
+
+            sudoku[i][a] = used[used.length-1].allOptions[c];
             buraco = false;
+
             for(let h = 0; h < 9; h++){//apagar todos aqueles que foram gerados por logica a frente do que foi mudado
               for(let g = 0; g < 9; g++){
                 if(h > i && !possible[h][g].completed){
@@ -218,16 +234,14 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 }
               }
             }
-            //o problema anda aqui
-            //possible[i][a].completed = true;
+
             break;
 
           }
         }
-        checkPossibles(imaginarySudoku);
+        checkPossibles(sudoku);
       }else{
         
-        let parar = false;
 
         for(let d = used.length - 1; d >= 0; d--){
           
@@ -235,24 +249,32 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
 
             console.log('apagar', used[d].allOptions.length)
             used = used.slice(0, -(used[d].allOptions.length));
-
-            let i = used[used.length - 1].position[0]
-            let a = used[used.length - 1].position[1]
-
-            for(let h = 0; h < 9; h++){
-              for(let g = 0; g < 9; g++){
-                if(h > i && !possible[h][g].completed){
-                  sudoku[h][g] = " "
-                }else if(h == i && g >= a && !possible[h][g].completed){
-                  sudoku[h][g] = " "
+            if(used.length < 1){
+              impossible = true;
+            }else{
+              let i = used[used.length - 1].position[0]
+              let a = used[used.length - 1].position[1]
+  
+              for(let h = 0; h < 9; h++){
+                for(let g = 0; g < 9; g++){
+                  if(h > i && !possible[h][g].completed){
+                    sudoku[h][g] = " "
+                  }else if(h == i && g >= a && !possible[h][g].completed){
+                    sudoku[h][g] = " "
+                  }
                 }
-              }
+              }   
             }
             break;
           }        
         }
-
-        checkPossibles(sudoku)
+        
+        if(!impossible){
+          checkPossibles(sudoku)
+        }else{
+          checkIfLastPossible(sudoku)
+        }
+       
 
         //loop infinito
       }
@@ -262,7 +284,6 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
       for(let i = 0; i < 9; i++){
         if (parar) break;
         for(let a = 0; a < 9; a++){
-          console.log(i, a)
           if(possible[i][a].completed == false && sudoku[i][a] == " "){
             
             if(used.length > 0){//caso nao seja a primeira vez a randomizar e nao estar num buraco, randomizar noutra possicao
@@ -275,10 +296,10 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 numbers: (possible[i][a].numbers.length > 0) && possible[i][a].numbers[0],
                 position : [i, a],
                 allOptions: possible[i][a].numbers,
-                optionsUsed: /*((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? [used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0])] :*/ [possible[i][a].numbers[0]]
+                optionsUsed: [possible[i][a].numbers[0]]
               })
               console.log(used[used.length-1])
-              imaginarySudoku[i][a] = possible[i][a].numbers[0];
+              sudoku[i][a] = possible[i][a].numbers[0];
               parar = true;
               //possible[i][a].completed = true;
               break;
@@ -293,17 +314,16 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 allOptions: possible[i][a].numbers,
                 optionsUsed:  [possible[i][a].numbers[0]]
               })
-              imaginarySudoku[i][a] = possible[i][a].numbers[0];
+              sudoku[i][a] = possible[i][a].numbers[0];
               console.log(used[0]);
               parar = true;
-              //possible[i][a].completed = true;
               break;
   
             }
           }
         }
       }
-      checkPossibles(imaginarySudoku);
+      checkPossibles(sudoku);
     }
     
 }
@@ -317,7 +337,7 @@ async function checkPossibles(sudoku) {
         possible[i][a].completed = true;//todos os que sao feitos com o randomizar vao ter o completed = false
       } else {
         possible[i][a].numbers = []
-        await fillPossibles(i, a, sudoku);
+        await fillPossibles(i, a, sudoku);//preenche a array possible com os números possiveis das células que não estão preenchidas
       }
     }
   }
@@ -330,24 +350,26 @@ function fillPossibles(i, a, sudoku) {
   let collumnEqual = false;
   let squareEqual = false;
   for (let c = 1; c <= 9; c++) {
+
     // map all the numbers from 1 to 9
     rowEqual = false;
     collumnEqual = false;
     squareEqual = false;
-    //check row
+
+    //verifica linha
     for (let r = 0; r < 9; r++) {
       if (sudoku[i][r] == c) {
         // a validar se os valores da linha sao iguais ao c(valor que está a ser testaddo)
         rowEqual = true;
       }
     }
-    //check collumn
+    //verifica coluna
     for (let d = 0; d < 9; d++) {
       if (sudoku[d][a] == c) {
         collumnEqual = true;
       }
     }
-    //checkSquare
+    //verifica quadrados
     if ((i + 1) / 3 <= 1) {
       //ve se ta nos 3 quadrados de cima
       if ((a + 1) / 3 <= 1) {
@@ -460,22 +482,16 @@ function checkLastPossible(sudoku) {
   for (let i = 0; i < 9; i++) {
     if (parar) break;
     for (let a = 0; a < 9; a++) {
-      if (
-        possible[i][a].completed == false &&
-        possible[i][a].numbers.length == 1 &&
-        sudoku[i][a] == " "
-      ) {
+      if ( possible[i][a].completed == false && possible[i][a].numbers.length == 1 &&sudoku[i][a] == " ") {
         // ve se só tem uma opcao
+ 
+        sudoku[i][a] = possible[i][a].numbers[0];
+        possible[i][a].completed = !randomizar;
+
         if(randomizar){
-        sudoku[i][a] = possible[i][a].numbers[0];
-        possible[i][a].completed = !randomizar;
-        //nao posso preencher tudo ao mesmo tempo
-        parar = true;
-        break;
-        }
-        sudoku[i][a] = possible[i][a].numbers[0];
-        possible[i][a].completed = !randomizar;
-        if(!randomizar) {
+          parar = true;
+          break;
+        }else {
           possible[i][a].numbers = []
         }
       }
