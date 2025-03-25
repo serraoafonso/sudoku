@@ -1,13 +1,13 @@
 const sudoku = [
-  [" ", "8", " ", " ", "3", "2", " ", "7", " "],
-  ["7", " ", " ", " ", " ", " ", "1", "6", " "],
-  [" ", " ", " ", " ", " ", "4", "5", " ", " "],
-  ["1", " ", " ", " ", " ", " ", " ", " ", "4"],
-  [" ", " ", " ", " ", "5", "6", "8", " ", " "],
-  ["5", " ", " ", "4", "2", " ", " ", " ", " "],
-  [" ", " ", " ", "3", " ", " ", " ", " ", " "],
-  ["4", " ", " ", " ", " ", " ", "8", " ", "1"],
-  [" ", "2", " ", " ", "7", " ", " ", " ", " "]
+  [" ", "8", " ", "7", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", "5", " ", "9", " ", " "],
+  ["7", " ", "1", " ", " ", "2", " ", "6", " "],
+  [" ", "2", " ", " ", " ", " ", " ", "8", " "],
+  [" ", "3", " ", " ", " ", "4", " ", " ", " "],
+  ["4", " ", "8", "9", " ", " ", "6", " ", " "],
+  ["6", " ", "4", " ", " ", "7", " ", "1", " "],
+  ["3", " ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", "2", " ", " ", " ", " ", "7"]
 ];
 
 
@@ -146,15 +146,14 @@ async function checkIfLastPossible(sudoku){
  console.log('---------------------')
   
 
-  let isLast = false
+  let isLast = false;
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
 
-      if (possible[i][a].completed == false && possible[i][a].numbers.length == 1){
-        
-        if(sudoku[i][a] == " "){
+      if (sudoku[i][a] == " " && possible[i][a].numbers.length == 1 && !possible[i][a].completed){
+          console.log([i, a], sudoku[i][a])
           isLast = true;
-        }  
+
         break;
 
       }else if(possible[i][a].numbers.length < 1 /*&& possible[i][a].completed == false*/  && sudoku[i][a] == " "){
@@ -162,8 +161,6 @@ async function checkIfLastPossible(sudoku){
         buraco = true;  
 
       }
-
-      
     }
   }
 
@@ -191,20 +188,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
   randomizar = true;
 
 
-    if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar
-
-
-      for(let g = 0; g < 9; g++){
-        for(let h = 0; h < 9; h++){
-          if(possible[g][h].completed == false){
-            imaginarySudoku[g][h] = " "
-          }
-        }
-      }
-
-
-//em principio ta tudo a funcionar ok, so falta aperfeiçoar o buraco, o nao buraco ta a colocar false no numero as vezes???
-
+    if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar, buraco é quando existe celulas sem nenhum possivel e vazias
 
       console.log('buraco', used.length)
       console.log(used[used.length - 1].allOptions, '->allOptions', used[used.length-1].optionsUsed, '->optionsUsed')
@@ -223,7 +207,18 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
               allOptions: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) /*&& used[used.length-1].optionsUsed.length > 0*/) ? used[used.length - 1].allOptions : possible[i][a].numbers,
               optionsUsed: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? /*optionsUsed.push(possible[i][a].numbers[0])*/    [...used[used.length - 1].optionsUsed, used[used.length-1].allOptions[c]] : [possible[i][a].numbers[0]]
             })
-            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];//o problema anda aqui
+            imaginarySudoku[i][a] = used[used.length-1].allOptions[c];
+            buraco = false;
+            for(let h = 0; h < 9; h++){//apagar todos aqueles que foram gerados por logica a frente do que foi mudado
+              for(let g = 0; g < 9; g++){
+                if(h > i && !possible[h][g].completed){
+                  sudoku[h][g] = " "
+                }else if(h == i && g > a && !possible[h][g].completed){
+                  sudoku[h][g] = " "
+                }
+              }
+            }
+            //o problema anda aqui
             //possible[i][a].completed = true;
             break;
 
@@ -231,31 +226,30 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
         }
         checkPossibles(imaginarySudoku);
       }else{
-        console.log('apagar')
+        
         let parar = false;
-        let i = used[used.length - 1].position[0]
-        let a = used[used.length - 1].position[1]
+
         for(let d = used.length - 1; d >= 0; d--){
           
           if(used[d].allOptions.length == used[d].optionsUsed.length){
-            
+
+            console.log('apagar', used[d].allOptions.length)
             used = used.slice(0, -(used[d].allOptions.length));
+
+            let i = used[used.length - 1].position[0]
+            let a = used[used.length - 1].position[1]
 
             for(let h = 0; h < 9; h++){
               for(let g = 0; g < 9; g++){
-                if(h > i){
+                if(h > i && !possible[h][g].completed){
                   sudoku[h][g] = " "
-                }else if(h == i && g >= a){
+                }else if(h == i && g >= a && !possible[h][g].completed){
                   sudoku[h][g] = " "
                 }
               }
             }
-
             break;
-
-          }
-          
-
+          }        
         }
 
         checkPossibles(sudoku)
@@ -281,7 +275,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 numbers: (possible[i][a].numbers.length > 0) && possible[i][a].numbers[0],
                 position : [i, a],
                 allOptions: possible[i][a].numbers,
-                optionsUsed: ((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0]) : [possible[i][a].numbers[0]]
+                optionsUsed: /*((used[used.length-1].position[0] == i && used[used.length-1].position[1] == a) && used[used.length-1].optionsUsed.length > 0) ? [used[used.length-1].optionsUsed.numbers.push(possible[i][a].numbers[0])] :*/ [possible[i][a].numbers[0]]
               })
               console.log(used[used.length-1])
               imaginarySudoku[i][a] = possible[i][a].numbers[0];
@@ -468,7 +462,8 @@ function checkLastPossible(sudoku) {
     for (let a = 0; a < 9; a++) {
       if (
         possible[i][a].completed == false &&
-        possible[i][a].numbers.length == 1
+        possible[i][a].numbers.length == 1 &&
+        sudoku[i][a] == " "
       ) {
         // ve se só tem uma opcao
         if(randomizar){
