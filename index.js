@@ -137,7 +137,7 @@ function start() {
 
 start();
 
-async function checkIfLastPossible(sudoku){
+function checkIfLastPossible(sudoku){
 
   if(impossible){
     console.log('O SUDOKU NÃO PODE SER RESOLVIDO!');
