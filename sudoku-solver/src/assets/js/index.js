@@ -1,4 +1,4 @@
-const sudoku = [
+/*let sudoku = [
   ["8", " ", " ", " ", " ", " ", " ", " ", " "],
   [" ", " ", "3", "6", " ", " ", " ", " ", " "],
   [" ", "7", " ", " ", "9", " ", "2", " ", " "],
@@ -8,10 +8,10 @@ const sudoku = [
   [" ", " ", "1", " ", " ", " ", " ", "6", "8"],
   [" ", " ", "8", "5", " ", " ", " ", "1", " "],
   [" ", "9", " ", " ", " ", " ", "4", " ", " "]
-];
+];*/
 
 //array bidimensional que mostra uma array para cada célula dos números possíveis
-const possible = [
+let possible = [
   [
     { numbers: [], completed: false },
     { numbers: [], completed: false },
@@ -129,23 +129,129 @@ optionsUsed: [1]
 let randomizar = false;//fica true quando a primeira célula recebe um valor randomizado
 
 let impossible = false;
+let res; 
 
-function start() {
+async function start(customSudoku) {
+
+   possible = [
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+  [
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+    { numbers: [], completed: false },
+  ],
+];
+
+  used = [];
   startTime = Date.now()
-  checkPossibles(sudoku)
+
+  await checkPossibles(customSudoku);
+
+  return {customSudoku, startTime}
 }
 
-start();
-
-function checkIfLastPossible(sudoku){
+async function checkIfLastPossible(sudoku){
 
   if(impossible){
     console.log('O SUDOKU NÃO PODE SER RESOLVIDO!');
     console.log('Execution time: ', Date.now() - startTime)
-    return;
+    return('impossivel'/*, Date.now() - startTime*/)
   }
 
-  console.log('---------------------')
+  //console.log('---------------------')
   full = true;
   for (let i = 0; i < 9; i++) {
     for(let a = 0; a < 9; a++){
@@ -154,10 +260,10 @@ function checkIfLastPossible(sudoku){
       }
     }
     
-    console.log(...sudoku[i]);
+    //console.log(...sudoku[i]);
      
  }
- console.log('---------------------')
+ //console.log('---------------------')
   
 
   let isLast = false;// variavel que indica se existe alguma casa em que esteja vazia e apenas com uma opção possível
@@ -186,11 +292,13 @@ function checkIfLastPossible(sudoku){
     for (let i = 0; i < 9; i++) {
         console.log(...sudoku[i]);
     }
-    console.log(`Execution time: ${Date.now() - startTime}`)
-
+    localStorage.setItem('tempo', Date.now() - startTime)
+    console.log(`Execution time: ${Date.now() - startTime}`) 
+    //console.log(res, sudoku)
+    return(sudoku /*,Date.now() - startTime*/)
   }else{
     
-    console.log('It ran out of lonely possible numbers')  
+    //console.log('It ran out of lonely possible numbers')  
     randomizeEmpty(sudoku)
 
   }
@@ -198,13 +306,13 @@ function checkIfLastPossible(sudoku){
 
 
 function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao possiveis de ser colocados nas celulas em falta, caso o sudoku de merda o codigo vai sempre trocar a celula anterior 
-  console.log(used)
+  //console.log(used)
   randomizar = true;
 
 
     if(buraco == true){//caso caia num buraco, objetivo é voltar atrás e mudar, buraco é quando existe celulas sem nenhum possivel e vazias
 
-      console.log('buraco', used.length)
+      //console.log('buraco', used.length)
 
       if(used[used.length - 1].allOptions.length > used[used.length-1].optionsUsed.length){
        
@@ -247,7 +355,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
           
           if(used[d].allOptions.length == used[d].optionsUsed.length){
 
-            console.log('apagar', used[d].allOptions.length)
+            //console.log('apagar', used[d].allOptions.length)
             used = used.slice(0, -(used[d].allOptions.length));
             if(used.length < 1){
               impossible = true;
@@ -280,7 +388,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
       }
     }else{
       let parar = false;
-      console.log('nao buraco', used.length)
+      //console.log('nao buraco', used.length)
       for(let i = 0; i < 9; i++){
         if (parar) break;
         for(let a = 0; a < 9; a++){
@@ -298,7 +406,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 allOptions: possible[i][a].numbers,
                 optionsUsed: [possible[i][a].numbers[0]]
               })
-              console.log(used[used.length-1])
+              //console.log(used[used.length-1])
               sudoku[i][a] = possible[i][a].numbers[0];
               parar = true;
               //possible[i][a].completed = true;
@@ -307,7 +415,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
   
             }else{// caso seja a primeira vez a randomizar
               
-              console.log('first time')
+              //console.log('first time')
               used.push({
                 numbers: possible[i][a].numbers[0],
                 position : [i, a],
@@ -315,7 +423,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
                 optionsUsed:  [possible[i][a].numbers[0]]
               })
               sudoku[i][a] = possible[i][a].numbers[0];
-              console.log(used[0]);
+              //console.log(used[0]);
               parar = true;
               break;
   
@@ -330,7 +438,7 @@ function randomizeEmpty(sudoku){//esta funcao vai randomizar os valores que sao 
 
 
 async function checkPossibles(sudoku) {
-  console.log('checkpossibles')
+  //console.log('checkpossibles')
   for (let i = 0; i < 9; i++) {
     for (let a = 0; a < 9; a++) {
       if (sudoku[i][a] != " " && !randomizar) {
@@ -341,7 +449,7 @@ async function checkPossibles(sudoku) {
       }
     }
   }
-  checkIfLastPossible(sudoku)
+  return checkIfLastPossible(sudoku)
 }
 
 function fillPossibles(i, a, sudoku) {
@@ -476,7 +584,7 @@ function fillPossibles(i, a, sudoku) {
 }
 
 function checkLastPossible(sudoku) {
-  console.log('checklastpossible')
+  //console.log('checklastpossible')
 
   let parar = false
   for (let i = 0; i < 9; i++) {
@@ -502,3 +610,4 @@ function checkLastPossible(sudoku) {
 }
 
 
+export {start}
