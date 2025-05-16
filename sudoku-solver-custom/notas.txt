@@ -1,0 +1,2 @@
+este projeto será exclusivamente feito sem o uso que qualquer inteligencia aritificial
+o objetivo é criar um algoritmo que consiga resolver qualquer sudoku corretamente

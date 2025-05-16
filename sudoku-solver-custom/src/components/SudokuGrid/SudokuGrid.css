@@ -1,0 +1,52 @@
+/* SudokuGrid.css */
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 40px);
+  grid-template-rows: repeat(9, 40px);
+}
+
+/* Células base */
+.sudoku-cell {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  box-sizing: border-box;
+  border: 1px solid #aaa; /* linha fina por padrão */
+  outline: none;
+  background-color: #fff;
+}
+
+/* Margens médias (linhas e colunas divisórias 3x3) */
+.sudoku-cell:nth-child(3n+1) {
+  border-left: 2px solid #666;
+}
+.sudoku-cell:nth-child(-n+9) {
+  border-top: 2px solid #666;
+}
+
+/* Margens grossas (bordas exteriores) */
+.sudoku-cell:nth-child(9n+1) {
+  border-left: 3px solid #000;
+}
+.sudoku-cell:nth-child(n+1):nth-child(-n+9) {
+  border-top: 3px solid #000;
+}
+.sudoku-cell:nth-child(9n) {
+  border-right: 3px solid #000;
+}
+.sudoku-cell:nth-last-child(-n+9) {
+  border-bottom: 3px solid #000;
+}
+
+/* Borda inferior média (fim de cada bloco 3x3) */
+.sudoku-cell:nth-child(n+19):nth-child(-n+27),
+.sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid #666;
+}
+
+
+.sudoku-cell[readonly] {
+  font-weight: bold;
+  cursor: default;
+}

@@ -56,10 +56,11 @@ const sudokuExtremo = [
 
 
 function App() {
-  const { difficulty, setTime } = useContext(DifficultyContext);
+  const { difficulty } = useContext(DifficultyContext);
   
    const [grid, setGrid] = useState([]);
-   const [resolvido, setResolvido] = useState(false)
+   const [resolvido, setResolvido] = useState(false);
+   const [time, setTime] = useState(0)
 
 useEffect(() => {
   const newGrid =
@@ -74,7 +75,9 @@ useEffect(() => {
   const resolverSudoku = async() => {
   const gridCopy = JSON.parse(JSON.stringify(grid)); // deep copy
   const res = await start(gridCopy);
-  const solved = res.customSudoku;
+  const solved = res?.customSudoku
+  const tempo =  res?.time;
+  setTime(tempo)
   setResolvido(true) // o start deve retornar um novo grid resolvido
 
   if (Array.isArray(solved)) {
@@ -86,6 +89,7 @@ useEffect(() => {
 
   return (
     <div className="app-container">
+      <h1>Sudoku Solver</h1>
       <Menu />
       <SudokuGrid initialGrid={grid} originalGrid={grid} />
       <button onClick={resolverSudoku}>Resolver</button>

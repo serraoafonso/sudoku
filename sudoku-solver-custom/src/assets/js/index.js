@@ -238,9 +238,8 @@ async function start(customSudoku) {
   used = [];
   startTime = Date.now()
 
-  return await checkPossibles(customSudoku);
+   return await checkPossibles(customSudoku);
 
-  
 }
 
 async function checkIfLastPossible(sudoku){
@@ -292,10 +291,11 @@ async function checkIfLastPossible(sudoku){
     for (let i = 0; i < 9; i++) {
         console.log(...sudoku[i]);
     }
-    let time = Date.now() - startTime
-    console.log(`Execution time: ${time}`) 
+    localStorage.setItem('tempo', Date.now() - startTime)
+    console.log(`Execution time: ${Date.now() - startTime}`) 
     let customSudoku = sudoku;
-    return {customSudoku, time}
+    //console.log(res, sudoku)
+    return {customSudoku, startTime}
   }else{
     
     //console.log('It ran out of lonely possible numbers')  
@@ -445,7 +445,7 @@ async function checkPossibles(sudoku) {
         possible[i][a].completed = true;//todos os que sao feitos com o randomizar vao ter o completed = false
       } else {
         possible[i][a].numbers = []
-         await fillPossibles(i, a, sudoku);//preenche a array possible com os números possiveis das células que não estão preenchidas
+        await fillPossibles(i, a, sudoku);//preenche a array possible com os números possiveis das células que não estão preenchidas
       }
     }
   }
@@ -590,7 +590,7 @@ function checkLastPossible(sudoku) {
   for (let i = 0; i < 9; i++) {
     if (parar) break;
     for (let a = 0; a < 9; a++) {
-      if ( possible[i][a].completed == false && possible[i][a].numbers.length == 1 && sudoku[i][a] == " ") {
+      if ( possible[i][a].completed == false && possible[i][a].numbers.length == 1 &&sudoku[i][a] == " ") {
         // ve se só tem uma opcao
  
         sudoku[i][a] = possible[i][a].numbers[0];
