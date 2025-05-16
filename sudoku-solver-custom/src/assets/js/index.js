@@ -129,9 +129,10 @@ optionsUsed: [1]
 let randomizar = false;//fica true quando a primeira célula recebe um valor randomizado
 
 let impossible = false;
-let res; 
 
 async function start(customSudoku) {
+
+  console.log(customSudoku)
 
    possible = [
   [
@@ -236,6 +237,10 @@ async function start(customSudoku) {
 ];
 
   used = [];
+  buraco = false;
+  full = false;
+  randomizar = false;
+  impossible = false; 
   startTime = Date.now()
 
    return await checkPossibles(customSudoku);
@@ -291,11 +296,13 @@ async function checkIfLastPossible(sudoku){
     for (let i = 0; i < 9; i++) {
         console.log(...sudoku[i]);
     }
-    localStorage.setItem('tempo', Date.now() - startTime)
-    console.log(`Execution time: ${Date.now() - startTime}`) 
+    let time = Date.now() - startTime
+    localStorage.setItem('tempo', time)
+    console.log(`Execution time: ${time}`) 
+    
     let customSudoku = sudoku;
     //console.log(res, sudoku)
-    return {customSudoku, startTime}
+    return {customSudoku, time}
   }else{
     
     //console.log('It ran out of lonely possible numbers')  

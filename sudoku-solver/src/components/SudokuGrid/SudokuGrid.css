@@ -50,3 +50,14 @@
   font-weight: bold;
   cursor: default;
 }
+
+/* Células originais (do tabuleiro inicial) */
+.original-cell {
+  color: #000;
+}
+
+/* Células resolvidas pelo algoritmo */
+.resolved-cell {
+  color: #293949;
+  font-weight: 500;
+}

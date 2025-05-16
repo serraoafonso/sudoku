@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SudokuGrid.css';
 
 const SudokuGrid = ({ initialGrid, originalGrid }) => {
@@ -9,7 +9,6 @@ const SudokuGrid = ({ initialGrid, originalGrid }) => {
   }, [initialGrid]);
 
   const handleChange = (row, col, value) => {
-
     const newGrid = grid.map((r, rowIndex) =>
       r.map((c, colIndex) =>
         rowIndex === row && colIndex === col ? value : c
@@ -21,21 +20,29 @@ const SudokuGrid = ({ initialGrid, originalGrid }) => {
   return (
     <div className="sudoku-grid">
       {grid.map((row, rowIndex) =>
-        row.map((cell, colIndex) => (
-          <input
-            key={`${rowIndex}-${colIndex}`}
-            className="sudoku-cell"
-            type="text"
-            maxLength="1"
-            value={cell === " " ? "" : cell}
-            onChange={(e) => handleChange(rowIndex, colIndex, e.target.value)}
-            readOnly={originalGrid[rowIndex][colIndex] !== " "}
-          />
-        ))
+        row.map((cell, colIndex) => {
+          const isOriginal = originalGrid[rowIndex][colIndex] !== " ";
+          const isResolved = !isOriginal && cell !== " ";
+
+          let className = "sudoku-cell";
+          if (isOriginal) className += " original-cell";
+          else if (isResolved) className += " resolved-cell";
+
+          return (
+            <input
+              key={`${rowIndex}-${colIndex}`}
+              className={className}
+              type="text"
+              maxLength="1"
+              value={cell === " " ? "" : cell}
+              onChange={(e) => handleChange(rowIndex, colIndex, e.target.value)}
+              readOnly={isOriginal}
+            />
+          );
+        })
       )}
     </div>
   );
 };
-
 
 export default SudokuGrid;

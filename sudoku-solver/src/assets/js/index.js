@@ -236,6 +236,10 @@ async function start(customSudoku) {
 ];
 
   used = [];
+  buraco = false;
+  full = false;
+  randomizar = false;
+  impossible = false; 
   startTime = Date.now()
 
   return await checkPossibles(customSudoku);

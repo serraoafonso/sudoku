@@ -50,3 +50,15 @@
   font-weight: bold;
   cursor: default;
 }
+
+
+/* Estilo para as células preenchidas manualmente */
+.sudoku-cell.fixed {
+  color: #000; /* exemplo: preto */
+  font-weight: 550;
+}
+
+/* Estilo para as células preenchidas pela solução do algoritmo */
+.sudoku-cell.solved {
+  color: #293949; /* exemplo: verde água */
+}

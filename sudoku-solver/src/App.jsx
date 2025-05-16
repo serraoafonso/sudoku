@@ -3,7 +3,7 @@ import SudokuGrid from './components/SudokuGrid/SudokuGrid';
 import './App.css';
 import Menu from './components/Menu/Menu';
 import { DifficultyContext } from './context/DifficultyContext';
-import {start} from './assets/js/index.js'
+import { start } from './assets/js/index.js';
 
 const sudokuFacil = [
   [" ", "3", " ", " ", "2", "7", " ", "5", "8"],
@@ -53,45 +53,47 @@ const sudokuExtremo = [
   [" ", "9", " ", " ", " ", " ", "4", " ", " "]
 ];
 
-
-
 function App() {
   const { difficulty } = useContext(DifficultyContext);
-  
-   const [grid, setGrid] = useState([]);
-   const [resolvido, setResolvido] = useState(false);
-   const [time, setTime] = useState(0)
 
-useEffect(() => {
-  const newGrid =
-    difficulty === "facil" ? sudokuFacil :
-    difficulty === "medio" ? sudokuMedio :
-    difficulty === "dificil" ? sudokuDificil :
-    sudokuExtremo;
+  const [grid, setGrid] = useState([]);
+  const [originalGrid, setOriginalGrid] = useState([]);
+  const [resolvido, setResolvido] = useState(false);
+  const [time, setTime] = useState(0);
 
-  setGrid(JSON.parse(JSON.stringify(newGrid)));
-}, [difficulty]);
+  useEffect(() => {
+    const newGrid =
+      difficulty === "facil" ? sudokuFacil :
+      difficulty === "medio" ? sudokuMedio :
+      difficulty === "dificil" ? sudokuDificil :
+      sudokuExtremo;
 
-  const resolverSudoku = async() => {
-  const gridCopy = JSON.parse(JSON.stringify(grid)); // deep copy
-  const res = await start(gridCopy);
-  const solved = res?.customSudoku
-  const tempo =  res?.time;
-  setTime(tempo)
-  setResolvido(true) // o start deve retornar um novo grid resolvido
+    const copiedGrid = JSON.parse(JSON.stringify(newGrid));
+    setGrid(copiedGrid);
+    setOriginalGrid(copiedGrid);
+    setResolvido(false);
+  }, [difficulty]);
 
-  if (Array.isArray(solved)) {
-    setGrid(solved); // Atualiza o estado com a solução
-  } else {
-    console.warn("O Sudoku não pôde ser resolvido.");
-  }
-};
+  const resolverSudoku = async () => {
+    const gridCopy = JSON.parse(JSON.stringify(grid));
+    const res = await start(gridCopy);
+    const solved = res?.customSudoku;
+    const tempo = res?.time;
+
+    if (Array.isArray(solved)) {
+      setGrid(solved);
+      setTime(tempo);
+      setResolvido(true);
+    } else {
+      console.warn("O Sudoku não pôde ser resolvido.");
+    }
+  };
 
   return (
     <div className="app-container">
       <h1>Sudoku Solver</h1>
       <Menu />
-      <SudokuGrid initialGrid={grid} originalGrid={grid} />
+      <SudokuGrid initialGrid={grid} originalGrid={originalGrid} />
       <button onClick={resolverSudoku}>Resolver</button>
       <p>{resolvido && `Tempo de execução: ${time} milissegundos`}</p>
     </div>
