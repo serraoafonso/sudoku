@@ -11,114 +11,13 @@
 ];*/
 
 //array bidimensional que mostra uma array para cada célula dos números possíveis
-let possible = [
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-  [
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-    { numbers: [], completed: false },
-  ],
-];
-
+let possible;
 
 
 let startTime;
-let full = false;
-let buraco = false; //entende-se buraco a situação em que os números randomizados levam a uma situação em que exista uma célula vazia e sem números possíveis nela
-let used = []; /*
+let full;
+let buraco; //entende-se buraco a situação em que os números randomizados levam a uma situação em que exista uma célula vazia e sem números possíveis nela
+let used; /*
 {
 numbers: 1,
 position: [0, 0],
@@ -126,9 +25,9 @@ allOptions: [1, 2, 3], -> todas as opções que podem ser usadas naquela célula
 optionsUsed: [1]
 }
 */
-let randomizar = false;//fica true quando a primeira célula recebe um valor randomizado
+let randomizar;//fica true quando a primeira célula recebe um valor randomizado
 
-let impossible = false;
+let impossible;
 
 async function start(customSudoku) {
 
@@ -243,8 +142,157 @@ async function start(customSudoku) {
   impossible = false; 
   startTime = Date.now()
 
-   return await checkPossibles(customSudoku);
+    return await checkIfPossible(customSudoku)
 
+}
+
+async function checkIfPossible(sudoku){
+  let isEqual = false;
+  
+  for (let i = 0; i < 9; i++){
+    for(let a = 0; a < 9; a++){
+
+      for(let b = 0; b < 9; b++){//ver linha
+        if(b == a  && sudoku[i][a] != " "){
+          continue;
+        }else if(sudoku[i][a] == sudoku[i][b] && sudoku[i][a] != " "){
+          isEqual = true;
+        }
+    }
+
+    for(let c = 0; c < 9; c++){
+      if(c == i && sudoku[i][a] != " "){
+        continue;
+      }else if(sudoku[i][a] == sudoku[c][a] && sudoku[i][a] != " "){
+        isEqual = true;
+      }
+    }
+
+if ((i + 1) / 3 <= 1) {
+      //ve se ta nos 3 quadrados de cima
+      if ((a + 1) / 3 <= 1) {
+        //primeiro quadrado
+        for (let e = 0; e < 3; e++) {
+          for (let f = 0; f < 3; f++) {
+            if (e == i && f == a ) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f] && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 1 && (a + 1) / 3 <= 2) {
+        //segundo
+        for (let e = 0; e < 3; e++) {
+          for (let f = 3; f < 6; f++) {
+            if ((e, f) == (i, a) ) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f] && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 2) {
+        //terceiro
+        for (let e = 0; e < 3; e++) {
+          for (let f = 6; f < 9; f++) {
+            if ((e, f) == (i, a) ) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f] && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+    } else if ((i + 1) / 3 > 1 && (i + 1) / 3 <= 2) {
+      //ve se ta nos 3 quadrados de meio
+      if ((a + 1) / 3 <= 1) {
+        //quarto quadrado
+        for (let e = 3; e < 6; e++) {
+          for (let f = 0; f < 3; f++) {
+            if ((e, f) == (i, a) ) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f]  && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 1 && (a + 1) / 3 <= 2) {
+        //quinto
+        for (let e = 3; e < 6; e++) {
+          for (let f = 3; f < 6; f++) {
+           if ((e, f) == (i, a)) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f]  && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 2) {
+        //sexto
+        for (let e = 3; e < 6; e++) {
+          for (let f = 6; f < 9; f++) {
+           if ((e, f) == (i, a)) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f] && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+    } else if ((i + 1) / 3 > 2) {
+      //ve se ta nos 3 quadrados de baixo
+      if ((a + 1) / 3 <= 1) {
+        //sétimo quadrado
+        for (let e = 6; e < 9; e++) {
+          for (let f = 0; f < 3; f++) {
+            if ((e, f) == (i, a)) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f]  && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 1 && (a + 1) / 3 <= 2) {
+        //oitavo
+        for (let e = 6; e < 9; e++) {
+          for (let f = 3; f < 6; f++) {
+            if ((e, f) == (i, a)) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f]  && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+      if ((a + 1) / 3 > 2) {
+        //nono
+        for (let e = 6; e < 9; e++) {
+          for (let f = 6; f < 9; f++) {
+            if ((e, f) == (i, a)) {
+              continue;
+            }else if(sudoku[i][a] == sudoku[e][f] && sudoku[i][a] != " "){
+              isEqual = true;
+            }
+          }
+        }
+      }
+    }
+
+    }
+  }
+  if(isEqual){
+    let time = startTime - Date.now()
+    return{customSudoku: 'impossivel', time} 
+  } else {
+    return await checkPossibles(sudoku);
+  }
+    
 }
 
 async function checkIfLastPossible(sudoku){
@@ -252,7 +300,8 @@ async function checkIfLastPossible(sudoku){
   if(impossible){
     console.log('O SUDOKU NÃO PODE SER RESOLVIDO!');
     console.log('Execution time: ', Date.now() - startTime)
-    return('impossivel'/*, Date.now() - startTime*/)
+    let time = Date.now() - startTime;
+    return({customSudoku: 'impossivel', time})
   }
 
   //console.log('---------------------')

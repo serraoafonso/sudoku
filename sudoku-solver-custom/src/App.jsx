@@ -7,6 +7,7 @@ import { start } from './assets/js/index.js';
 function App() {
   const { difficulty } = useContext(DifficultyContext);
   const [time, setTime] = useState(0);
+  const [impossivel, setImpossivel] = useState(false)
 
   // Estado para a grid de números
   const [grid, setGrid] = useState([
@@ -79,6 +80,7 @@ function App() {
         setResolvido(true);
       } else {
         console.warn("O Sudoku não pôde ser resolvido ou o formato da resposta é inesperado.");
+        setImpossivel(true)
       }
     } catch (error) {
       console.error("Erro ao resolver o Sudoku:", error);
@@ -92,7 +94,7 @@ function App() {
       <SudokuGrid grid={grid} setGrid={setGrid} fixed={fixed} setFixed={setFixed} />
       <button onClick={resolverSudoku}>Resolver</button>
       <button onClick={limpar}>Limpar</button>
-      <p>{resolvido && `Tempo de execução: ${time} milissegundos`}</p>
+      <p>{resolvido ? ( `Tempo de execução: ${time} milissegundos`) : (impossivel && 'O sudoku é impossível de ser resolvido')}</p>
     </div>
   );
 }
