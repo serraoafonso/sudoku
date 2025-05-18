@@ -8,6 +8,7 @@ function App() {
   const { difficulty } = useContext(DifficultyContext);
   const [time, setTime] = useState(0);
   const [impossivel, setImpossivel] = useState(false)
+  const [igual, setIgual] = useState(false)
 
   // Estado para a grid de números
   const [grid, setGrid] = useState([
@@ -50,6 +51,8 @@ function App() {
         .map(() => Array(9).fill(false))
     );
     setResolvido(false);
+    setImpossivel(false);
+    setIgual(false);
   }
 
   const resolverSudoku = async () => {
@@ -78,9 +81,11 @@ function App() {
         // Se desejar, pode também manter o estado 'fixed' inalterado.
         setGrid(novaGrid);
         setResolvido(true);
-      } else {
+      } else if(res.customSudoku == 'impossivel'){
         console.warn("O Sudoku não pôde ser resolvido ou o formato da resposta é inesperado.");
         setImpossivel(true)
+      }else{
+        setIgual(true)
       }
     } catch (error) {
       console.error("Erro ao resolver o Sudoku:", error);
@@ -94,7 +99,7 @@ function App() {
       <SudokuGrid grid={grid} setGrid={setGrid} fixed={fixed} setFixed={setFixed} />
       <button onClick={resolverSudoku}>Resolver</button>
       <button onClick={limpar}>Limpar</button>
-      <p>{resolvido ? ( `Tempo de execução: ${time} milissegundos`) : (impossivel && 'O sudoku é impossível de ser resolvido')}</p>
+      <p>{resolvido ? ( `Tempo de execução: ${time} milissegundos`) : (impossivel ? 'O sudoku é impossível de ser resolvido' : (igual && 'Este sudoku serve de desafio para a Mostra Nacional de Ciência, experimenta outro sudoku!'))}</p>
     </div>
   );
 }
