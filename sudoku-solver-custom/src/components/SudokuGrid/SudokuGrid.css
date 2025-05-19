@@ -3,6 +3,7 @@
   display: grid;
   grid-template-columns: repeat(9, 40px);
   grid-template-rows: repeat(9, 40px);
+  max-width: 85vw;
 }
 
 /* Células base */
