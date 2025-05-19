@@ -63,3 +63,16 @@
 .sudoku-cell.solved {
   color: #293949; /* exemplo: verde água */
 }
+
+@media only screen and (max-width: 700px) {
+ .sudoku-cell{
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  .sudoku-grid {
+  grid-template-columns: repeat(9, 30px);
+  grid-template-rows: repeat(9, 30px);
+}
+}
