@@ -16,6 +16,13 @@
 
 h1{
   font-family: "Montserrat", sans-serif;
-  font-size: 48px;
+  font-size: 50px;
   color: #293949
+}
+
+
+@media only screen and (max-width: 700px) {
+  h1{
+    font-size: 35px;
+  }
 }
