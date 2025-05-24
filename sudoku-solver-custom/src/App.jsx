@@ -62,6 +62,7 @@ function App() {
         setFixed={setFixed}
         bloqueado={resolvido}
       />
+      
       <button onClick={resolverSudoku}>
         {carregando ? <span className='carregando'></span> : 'Resolver'}
       </button>
@@ -73,6 +74,9 @@ function App() {
           ? 'O sudoku é impossível de ser resolvido'
           : igual && 'Este sudoku serve de desafio para a Mostra Nacional de Ciência, experimenta outro sudoku!'}
       </p>
+      <div className='divAuthor'>
+        <p className='author'>By Afonso Serrão</p>
+      </div>
     </div>
   );
 }

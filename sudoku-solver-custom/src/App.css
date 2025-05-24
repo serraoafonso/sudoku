@@ -4,12 +4,11 @@
 
 
 .app-container {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  justify-content: center;
+  justify-content: space-between; /* Espaça topo/conteúdo/rodapé */
   align-items: center;
   background-color: #f0f0f0;
 }
@@ -33,10 +32,23 @@ span.carregando {
 }
 
 
+.divAuthor{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.author{
+  color: #293949;
+  margin-right: 50px;
+}
+
 @media only screen and (max-width: 700px) {
   h1{
     font-size: 35px;
   }
+
 }
 
 @keyframes roda {
